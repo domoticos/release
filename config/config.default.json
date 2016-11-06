@@ -1,0 +1,13 @@
+{
+  "host": "users-auth-app.feathersjs.com",
+  "port": 7878,
+  "base": "../",
+  "nedb": "../data/",
+  "public": "../public/",
+  "auth": {
+    "token": {
+      "secret": "i16mLa4qAGV9vmgU6hBPOds2Lc63RqLWepFYiiGtm33nmYZaPZzHTh8mAyImLzGIBfeNeVSCsMH3G53KPAgEXA=="
+    },
+    "local": {}
+  }
+}
