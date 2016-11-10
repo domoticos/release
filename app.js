@@ -59,6 +59,14 @@ app.use(compress())
     }
   });
 
+  // create dashboard page
+
+  app.service('/pages').find().then(users => {
+    if(users.length === 0){
+      app.service('pages').create({_id: 'dashboard', title:"Dashboard", content:{}});
+    }
+  });
+
   // create some properties
 
   app.service('/properties').find({query: {key:'pagesOrder'}}).then(pagesOrder => {
