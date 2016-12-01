@@ -2,6 +2,7 @@ const jsonLogic = require('json-logic-js');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
 const EventEmitter = require('events');
+const later = require('later');
 const {NodeVM} = require('vm2');
 const path = require('path');
 const asyncFn = require('asyncawait/async');
@@ -21,14 +22,23 @@ class RulesEngine extends EventEmitter {
     const rulesEngine = this;
     rulesEngine.sandbox = {
       events: [],
+      schedules: [],
       async: asyncFn,
       await: awaitFn,
       echo: function(text){
         console.log(text);
       },
       on: function(event, callback){
-        rulesEngine.sandbox.events.push(event);
-        rulesEngine.on(event, callback);
+        if(event.indexOf('time.') === -1){
+          rulesEngine.sandbox.events.push(event);
+          rulesEngine.on(event, callback);
+        } else {
+          later.date.localTime();
+          const cron = event.replace('time.', '');
+          //var schedule = later.schedule(later.parse.cron(cron));
+          const schedule = later.parse.cron(cron);
+          rulesEngine.sandbox.schedules.push(later.setInterval(callback, schedule));
+        }
       },
       setState: function(attributeId, state){
         return new Promise(function(resolve, reject) {
@@ -50,13 +60,18 @@ class RulesEngine extends EventEmitter {
           }, seconds*1000);
         })
       },
-      sendMail: function(email, subject, body){
+      sendMail: function(email, subject, body, attachment){
         return new Promise(function(resolve, reject) {
           let mailOptions = {
             from: '"My Home" <myhome@myhome.com>',
             to: email,
             subject: subject,
             //text: '',
+            attachments: [
+              {
+                path: attachment
+              }
+            ],
             html: body,
           };
           transporter.sendMail(mailOptions, function(error, info){
@@ -76,6 +91,7 @@ class RulesEngine extends EventEmitter {
       //timeout: 1000,
       require: {
         external: true,
+        import: ['later']
       },
       sandbox: this.sandbox,
       console: 'inherit',
@@ -84,7 +100,7 @@ class RulesEngine extends EventEmitter {
     //this.vm.run('const {async, await} = require("'+libPath+'");');
   }
 
-  
+
   loadRules() {
     const engine = this;
     return new Promise(function(resolve, reject) {
@@ -96,8 +112,12 @@ class RulesEngine extends EventEmitter {
       engine.sandbox.events.forEach(function(event){
         engine.removeAllListeners(event);
       });
-      engine.sandbox.events = [];
+      engine.sandbox.schedules.forEach(function(schedule){
+        schedule.clear();
+      });
 
+      engine.sandbox.events = [];
+      engine.sandbox.schedules = [];
       engine.app.service('rules').find({query: query}).then(rules => {
         rules.map(rule => {
           engine.vm.run(rule.code);

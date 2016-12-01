@@ -40,7 +40,9 @@ module.exports = function(app){
   iotdb.settings = function() {
         return {
           get: function(key, otherwise) {
+            console.log("++++++++ key",key)
             var data = getConfig(key, otherwise);
+            console.log('++++++++ data', data)
             return data;
           }
         }

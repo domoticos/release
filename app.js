@@ -60,9 +60,8 @@ app.use(compress())
   });
 
   // create dashboard page
-
-  app.service('/pages').find().then(users => {
-    if(users.length === 0){
+  app.service('/pages').find({query: {key:'dashboard'}}).then(pages => {
+    if(pages.length === 0){
       app.service('pages').create({_id: 'dashboard', title:"Dashboard", content:{}});
     }
   });
