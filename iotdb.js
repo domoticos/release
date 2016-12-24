@@ -211,6 +211,7 @@ const _universal_thing_id = thing => {
         iotdb.use("homestar-samsung-smart-tv");
         iotdb.use("homestar-knx");
         iotdb.use("homestar-rest");
+        iotdb.use("homestar-chromecast");
         start();
         me.rulesEngine.loadRules();
       });
@@ -224,6 +225,7 @@ const _universal_thing_id = thing => {
         iotdb.use("homestar-samsung-smart-tv");
         iotdb.use("homestar-knx");
         iotdb.use("homestar-rest");
+        iotdb.use("homestar-chromecast");
         start();
       });
     }

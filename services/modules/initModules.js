@@ -54,5 +54,16 @@ module.exports = [
     "settingFields":[
 
     ]
+  },
+  {
+    "name":"homestar-chromecast",
+    "path":"../homestar-chromecast",
+    "label":"Chromecast",
+    "description":"Cast to Google Chromecast devices",
+    "bridge":"ChromecastBridge",
+    "enabled": true,
+    "settingFields":[
+
+    ]
   }
 ]
